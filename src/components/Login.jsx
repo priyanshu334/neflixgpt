@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import Header from "./Header";
 import {checkValidData} from "../utils/validate"
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {auth} from "../utils/firebase"
 const Login = ()=>{
     const [isSignInForm,setIsSignInForm] = useState(true);
     const [errorMessage,setErrorMessage] = useState("")
@@ -12,11 +14,34 @@ const Login = ()=>{
     const handleOnClick = ()=>{
         //validate the form data
         //   checkValidData(email,password)
-        console.log(email.current.value)
-        console.log(password.current.value);
+      
+     
         const message = checkValidData(email.current.value,password.current.value)
         setErrorMessage(message)
-        console.log(message)
+        if(message) return ;
+
+        ///Sign in , Sign up login 
+        if(!isSignInForm){
+            createUserWithEmailAndPassword(auth,email.current.value,password.current.value).then((userCreadential)=>{
+                const user = userCreadential.user;
+            }).catch((error)=>{
+                const errorCode = error.code;
+                const errorMessage =error.message;
+                setErrorMessage(errorCode + errorMessage)
+
+            })
+
+            //signUp form login
+        }else{
+           //sign in form logic
+           signInWithEmailAndPassword(auth,email.current.value,password.current.value).then((userCreadential)=>{
+            const user=userCreadential.user;
+           }).catch((error)=>{
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            setErrorMessage(errorCode+errorMessage);
+           })
+        }
         
     }
     return (
@@ -37,9 +62,9 @@ const Login = ()=>{
                 <input
                 ref={password}
                  type="password" placeholder="Enter password" className="p-4 m-2 w-full bg-gray-900 rounded-lg"/>
-                 <p className="text-red-600 font-bold mx-4 text-lg p-2">{errorMessage}</p>
+                 <p className="text-red-600 font-bold mx-4  text-lg p-2">{errorMessage}</p>
 
-                <button className="p-4 m-2 mt-10 bg-red-700 w-full rounded-lg" onClick={handleOnClick}> {isSignInForm?"Sign In":"Sign Up"}</button>
+                <button className="p-4 m-2 mt-10 font-bold text-2xl bg-red-700 w-full rounded-lg" onClick={handleOnClick}> {isSignInForm?"Sign In":"Sign Up"}</button>
 
                 <p className="py-6 cursor-pointer "onClick={toogleSignInForm}> {isSignInForm?"New to netflix Sign Up now":"already a member Log IN "} </p>
             </form>

@@ -5,6 +5,9 @@
 - configure Routing
 - using useRef hook
 - validating signup form 
+- firebase setup 
+- deploying our app to firebase
+- create Signup user account 
 
 #features 
 -Login/Sign Up
