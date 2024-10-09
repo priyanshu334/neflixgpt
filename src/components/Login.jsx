@@ -1,13 +1,20 @@
 import { useRef, useState } from "react";
 import Header from "./Header";
 import {checkValidData} from "../utils/validate"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import {auth} from "../utils/firebase"
+import { useNavigate } from "react-router-dom";
+import  {useDispatch} from "react-redux"
+import { addUser } from "../utils/userSliice";
+
 const Login = ()=>{
+    const navigate = useNavigate()
     const [isSignInForm,setIsSignInForm] = useState(true);
     const [errorMessage,setErrorMessage] = useState("")
     const email = useRef(null);
     const password = useRef(null);
+    const name = useRef(null);
+    const dispatch = useDispatch();
     const toogleSignInForm =()=>{
       setIsSignInForm(!isSignInForm);
     }
@@ -24,6 +31,26 @@ const Login = ()=>{
         if(!isSignInForm){
             createUserWithEmailAndPassword(auth,email.current.value,password.current.value).then((userCreadential)=>{
                 const user = userCreadential.user;
+                updateProfile(user,{
+                    displayName: name.current.value,
+                    photoURL:"https://i.pinimg.com/236x/c7/58/7e/c7587eec8e58a3eb06f5931d51f6e436.jpg"
+
+                }).then(()=>{
+                    const [uid,email,displayName,photoURL]=auth.currentUser;
+                    dispatch(
+                        addUser({
+                            uid:uid,
+                            email:email,
+                            displayName:displayName,
+                            photoURL:photoURL
+
+                        })
+                    )
+                    navigate("/browse")
+                }).catch((error)=>{
+                   setErrorMessage(error.message)
+                })
+              
             }).catch((error)=>{
                 const errorCode = error.code;
                 const errorMessage =error.message;
@@ -36,6 +63,8 @@ const Login = ()=>{
            //sign in form logic
            signInWithEmailAndPassword(auth,email.current.value,password.current.value).then((userCreadential)=>{
             const user=userCreadential.user;
+            navigate("/browse")
+            
            }).catch((error)=>{
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -53,7 +82,7 @@ const Login = ()=>{
 
             <form onSubmit={(e)=>e.preventDefault()} className="p-12 w-3/12 absolute bg-black my-36 mx-auto right-0 left-0 text-white opacity-85 ">
             <h1 className="font-bold text-3xl m-2 py-4"> {isSignInForm?"Sign In":"Sign Up"}</h1>
-            {!isSignInForm && <input type="text" placeholder="Full Name" className="p-4 m-2 w-full bg-gray-900 rounded-lg"/>}
+            {!isSignInForm && <input ref={name} type="text" placeholder="Full Name" className="p-4 m-2 w-full bg-gray-900 rounded-lg"/>}
 
                 <input
                  ref={email}

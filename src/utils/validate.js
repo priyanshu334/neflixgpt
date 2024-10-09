@@ -3,10 +3,10 @@ export const checkValidData = (email, password) => {
     const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     const isEmailValid = emailPattern.test(email);
-    const isPasswordValid = passwordPattern.test(password);
+    // const isPasswordValid = passwordPattern.test(password);
 
     if (!isEmailValid) return "email is not valid";
-    if (!isPasswordValid) return "password is not valid";
+    // if (!isPasswordValid) return "password is not valid";
     
     return null;
 };
