@@ -2,6 +2,9 @@
 
 - create React App
 - configure Tailwind
+- configure Routing
+- using useRef hook
+- validating signup form 
 
 #features 
 -Login/Sign Up
